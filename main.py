@@ -28,7 +28,7 @@ from pathlib import Path
 
 def cmd_prepare(args):
     """데이터 전처리 명령어"""
-    from src.prepare_data import prepare_dataset, compress_dataset
+    from src.prepare_data import prepare_dataset, prepare_mixed_dataset, compress_dataset
     
     source_dir = Path(args.source)
     output_dir = Path(args.output)
@@ -38,7 +38,7 @@ def cmd_prepare(args):
         return 1
     
     print("=" * 60)
-    print("Korean Food Dataset Preparation")
+    print("Food Dataset Preparation")
     print("=" * 60)
     print(f"Source: {source_dir}")
     print(f"Output: {output_dir}")
@@ -47,29 +47,70 @@ def cmd_prepare(args):
     print("=" * 60)
     
     # 데이터셋 전처리
-    stats = prepare_dataset(
-        source_dir=source_dir,
-        output_dir=output_dir,
-        mode=args.mode,
-        train_ratio=args.train_ratio,
-        val_ratio=args.val_ratio,
-        seed=args.seed
-    )
-    
-    # 결과 출력
-    print("\n" + "=" * 60)
-    print("Preparation Complete!")
-    print("=" * 60)
-    print(f"Mode: {stats['mode']}")
-    print(f"Total classes: {stats['total_classes']}")
-    print(f"Valid classes: {stats['valid_classes']}")
-    print(f"Train images: {stats['train_images']:,}")
-    print(f"Val images: {stats['val_images']:,}")
-    print(f"Test images: {stats['test_images']:,}")
-    print(f"Total images: {stats['train_images'] + stats['val_images'] + stats['test_images']:,}")
-    
-    if stats["skipped_classes"]:
-        print(f"\nSkipped classes ({len(stats['skipped_classes'])}): {stats['skipped_classes']}")
+    if args.mode == "mixed":
+        # 혼합 모드: 한식 + Food-101
+        food101_dir = Path("datasets/food_101")
+        if not food101_dir.exists():
+            print(f"Error: Food-101 directory not found: {food101_dir}")
+            return 1
+        
+        print(f"Food-101 Source: {food101_dir}")
+        
+        stats = prepare_mixed_dataset(
+            kfood_source_dir=source_dir,
+            food101_source_dir=food101_dir,
+            output_dir=output_dir,
+            train_ratio=args.train_ratio,
+            val_ratio=args.val_ratio,
+            seed=args.seed
+        )
+        
+        # 혼합 모드 결과 출력
+        print("\n" + "=" * 60)
+        print("Preparation Complete!")
+        print("=" * 60)
+        print(f"Mode: {stats['mode']}")
+        print(f"Korean food classes: {stats['kfood_classes']}")
+        print(f"Food-101 classes: {stats['food101_classes']}")
+        print(f"Total classes: {stats['total_classes']}")
+        print(f"Valid classes: {stats['valid_classes']}")
+        print(f"Train images: {stats['train_images']:,}")
+        print(f"Val images: {stats['val_images']:,}")
+        print(f"Test images: {stats['test_images']:,}")
+        print(f"Total images: {stats['train_images'] + stats['val_images'] + stats['test_images']:,}")
+        
+        if stats["merged_classes"]:
+            print(f"\nMerged classes ({len(stats['merged_classes'])}):")
+            for merged in stats["merged_classes"]:
+                print(f"  - {merged}")
+        
+        if stats["skipped_classes"]:
+            print(f"\nSkipped classes ({len(stats['skipped_classes'])}): {stats['skipped_classes']}")
+    else:
+        # 기존 모드: test 또는 full
+        stats = prepare_dataset(
+            source_dir=source_dir,
+            output_dir=output_dir,
+            mode=args.mode,
+            train_ratio=args.train_ratio,
+            val_ratio=args.val_ratio,
+            seed=args.seed
+        )
+        
+        # 결과 출력
+        print("\n" + "=" * 60)
+        print("Preparation Complete!")
+        print("=" * 60)
+        print(f"Mode: {stats['mode']}")
+        print(f"Total classes: {stats['total_classes']}")
+        print(f"Valid classes: {stats['valid_classes']}")
+        print(f"Train images: {stats['train_images']:,}")
+        print(f"Val images: {stats['val_images']:,}")
+        print(f"Test images: {stats['test_images']:,}")
+        print(f"Total images: {stats['train_images'] + stats['val_images'] + stats['test_images']:,}")
+        
+        if stats["skipped_classes"]:
+            print(f"\nSkipped classes ({len(stats['skipped_classes'])}): {stats['skipped_classes']}")
     
     # 압축
     if args.compress:
@@ -138,14 +179,16 @@ def cmd_predict(args):
 def main():
     """메인 CLI 엔트리포인트"""
     parser = argparse.ArgumentParser(
-        description="Korean Food Classification using YOLOv11",
+        description="Food Classification using YOLOv11",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 예시:
-  %(prog)s prepare --mode test --compress    # 20개 클래스 전처리 + 압축
-  %(prog)s prepare --mode full --compress    # 150개 클래스 전처리 + 압축
+  %(prog)s prepare --mode test --compress    # 한식 20개 클래스 전처리 + 압축
+  %(prog)s prepare --mode full --compress    # 한식 150개 클래스 전처리 + 압축
+  %(prog)s prepare --mode mixed --compress   # 한식 + Food-101 통합 (39개 클래스) + 압축
   %(prog)s train --config config/train_config_test.yaml    # 테스트 학습
   %(prog)s train --config config/train_config_full.yaml    # 전체 학습
+  %(prog)s train --config config/train_config_mixed.yaml   # 통합 학습
   %(prog)s predict --model best.pt --image food.jpg        # 추론
         """
     )
@@ -155,14 +198,14 @@ def main():
     # ========== prepare 서브커맨드 ==========
     prepare_parser = subparsers.add_parser(
         'prepare',
-        help='AI Hub 데이터셋 전처리',
-        description='AI Hub 한국 음식 이미지 데이터셋을 YOLO 학습 형식으로 변환합니다.'
+        help='데이터셋 전처리',
+        description='AI Hub 한식 및 Food-101 데이터셋을 YOLO 학습 형식으로 변환합니다.'
     )
     prepare_parser.add_argument(
         '--source',
         type=str,
         default='datasets/kfood',
-        help='원본 데이터셋 경로 (기본: datasets/kfood)'
+        help='한식 데이터셋 경로 (기본: datasets/kfood)'
     )
     prepare_parser.add_argument(
         '--output',
@@ -173,9 +216,9 @@ def main():
     prepare_parser.add_argument(
         '--mode',
         type=str,
-        choices=['test', 'full'],
+        choices=['test', 'full', 'mixed'],
         default='test',
-        help='처리 모드: test (20개 클래스) 또는 full (150개 클래스)'
+        help='처리 모드: test (한식 20개), full (한식 150개), mixed (한식+Food-101 39개)'
     )
     prepare_parser.add_argument(
         '--train-ratio',
