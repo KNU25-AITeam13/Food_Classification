@@ -2,15 +2,15 @@
 # 20개 대중 음식 클래스로 빠른 파이프라인 검증
 
 # 모델 설정
-model: yolo11m-cls.pt
+model: yolo11l-cls.pt  # m → l (더 높은 정확도)
 
 # 데이터 경로
 data: data
 
 # 학습 하이퍼파라미터
 epochs: 30
-batch: 64
-imgsz: 224
+batch: 128          # 64 → 128 (GPU 메모리 여유 시 192까지 가능)
+imgsz: 224          # 320으로 올리면 정확도↑, 메모리↑
 
 # 최적화 설정
 optimizer: auto
@@ -23,7 +23,8 @@ weight_decay: 0.0005
 patience: 10
 
 # 데이터 로딩
-workers: 8
+workers: 16         # 제온 88코어 기준 (GPU 병목 고려)
+cache: true         # 데이터셋을 RAM에 캐싱하여 I/O 병목 감소
 
 # 디바이스 설정 (GPU)
 device: 0

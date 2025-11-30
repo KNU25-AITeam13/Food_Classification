@@ -2,14 +2,14 @@
 # 150개 전체 클래스 학습
 
 # 모델 설정
-model: yolo11m-cls.pt
+model: yolo11l-cls.pt  # m → l (더 높은 정확도)
 
 # 데이터 경로
 data: data
 
 # 학습 하이퍼파라미터
 epochs: 100
-batch: 64
+batch: 128          # 64 → 128 (GPU 메모리 활용 증가)
 imgsz: 224
 
 # 최적화 설정
@@ -23,7 +23,8 @@ weight_decay: 0.0005
 patience: 15
 
 # 데이터 로딩
-workers: 8
+workers: 16         # 제온 88코어 기준 (GPU 병목 고려)
+cache: true         # RAM 캐싱으로 I/O 병목 감소
 
 # 디바이스 설정 (GPU)
 device: 0

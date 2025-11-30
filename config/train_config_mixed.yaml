@@ -2,14 +2,14 @@
 # 한식 20개 + Food-101 19개 = 39개 클래스 (bibimbap은 비빔밥에 병합)
 
 # 모델 설정
-model: yolo11m-cls.pt
+model: yolo11l-cls.pt  # m → l (더 높은 정확도)
 
 # 데이터 경로
 data: data
 
 # 학습 하이퍼파라미터 (최적화)
 epochs: 100
-batch: 64
+batch: 96           # 64 → 96 (imgsz 320 기준, OOM 발생 시 64로)
 imgsz: 320  # 224 → 320 (해상도 증가로 정확도 향상)
 
 # 최적화 설정
@@ -27,7 +27,8 @@ label_smoothing: 0.1  # 과적합 방지
 patience: 20  # 충분한 학습 허용
 
 # 데이터 로딩
-workers: 8
+workers: 16         # 제온 88코어 기준 (GPU 병목 고려)
+cache: true         # RAM 캐싱으로 I/O 병목 감소
 
 # 디바이스 설정 (GPU)
 device: 0
