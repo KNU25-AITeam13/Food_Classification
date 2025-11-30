@@ -75,7 +75,7 @@ FOOD101_CLASS_MAPPING = {
 }
 
 # Food-101 클래스당 최대 이미지 수 (한식 데이터와 균형 맞춤)
-FOOD101_MAX_IMAGES_PER_CLASS = 500
+FOOD101_MAX_IMAGES_PER_CLASS = 1000
 
 # 지원하는 이미지 확장자 (GIF 제외)
 VALID_EXTENSIONS = {".jpg", ".jpeg", ".png"}
