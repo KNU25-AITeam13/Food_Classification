@@ -1,0 +1,29 @@
+[project]
+name = "food-classification"
+version = "0.1.0"
+description = "Korean Food Classification using YOLOv11"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "ultralytics>=8.3.0",
+    "torch>=2.5.0",
+    "torchvision>=0.20.0",
+    "pillow",
+    "pandas",
+    "tqdm",
+    "pyyaml",
+]
+
+# PyTorch CUDA 설정 (Linux에서만 CUDA 12.8 인덱스 사용, Windows는 PyPI 기본값)
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+    { index = "pytorch-cu128", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

@@ -1,0 +1,48 @@
+# YOLOv11 한국 음식 분류 - 전체 학습 설정
+# 150개 전체 클래스 학습
+
+# 모델 설정
+model: yolo11m-cls.pt
+
+# 데이터 경로
+data: data
+
+# 학습 하이퍼파라미터
+epochs: 100
+batch: 64
+imgsz: 224
+
+# 최적화 설정
+optimizer: auto
+lr0: 0.01
+lrf: 0.01
+momentum: 0.937
+weight_decay: 0.0005
+
+# Early Stopping
+patience: 15
+
+# 데이터 로딩
+workers: 8
+
+# 디바이스 설정 (GPU)
+device: 0
+
+# 출력 설정
+project: runs/classify
+name: korean_food_full
+
+# 기타 설정
+exist_ok: true
+pretrained: true
+verbose: true
+
+# 데이터 증강 (분류 모델 기본값 사용)
+# hsv_h: 0.015
+# hsv_s: 0.7
+# hsv_v: 0.4
+# degrees: 0.0
+# translate: 0.1
+# scale: 0.5
+# fliplr: 0.5
+# mosaic: 0.0
