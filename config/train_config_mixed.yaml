@@ -1,4 +1,4 @@
-# YOLOv11 음식 분류 - 통합 학습 설정
+# YOLOv11 음식 분류 - 통합 학습 설정 (성능 최적화 버전)
 # 한식 20개 + Food-101 19개 = 39개 클래스 (bibimbap은 비빔밥에 병합)
 
 # 모델 설정
@@ -7,20 +7,24 @@ model: yolo11m-cls.pt
 # 데이터 경로
 data: data
 
-# 학습 하이퍼파라미터
-epochs: 50
+# 학습 하이퍼파라미터 (최적화)
+epochs: 100
 batch: 64
-imgsz: 224
+imgsz: 320  # 224 → 320 (해상도 증가로 정확도 향상)
 
 # 최적화 설정
-optimizer: auto
-lr0: 0.01
+optimizer: AdamW
+lr0: 0.001  # 더 안정적인 학습률
 lrf: 0.01
 momentum: 0.937
 weight_decay: 0.0005
+warmup_epochs: 5  # 워밍업 추가
+
+# 정규화
+label_smoothing: 0.1  # 과적합 방지
 
 # Early Stopping
-patience: 12
+patience: 20  # 충분한 학습 허용
 
 # 데이터 로딩
 workers: 8
@@ -37,12 +41,12 @@ exist_ok: true
 pretrained: true
 verbose: true
 
-# 데이터 증강 (분류 모델 기본값 사용)
-# hsv_h: 0.015
-# hsv_s: 0.7
-# hsv_v: 0.4
-# degrees: 0.0
-# translate: 0.1
-# scale: 0.5
-# fliplr: 0.5
-# mosaic: 0.0
+# 데이터 증강 (강화)
+hsv_h: 0.02
+hsv_s: 0.8
+hsv_v: 0.5
+degrees: 15.0
+translate: 0.15
+scale: 0.6
+fliplr: 0.5
+erasing: 0.1  # Random Erasing

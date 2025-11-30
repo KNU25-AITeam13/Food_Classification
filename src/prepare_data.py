@@ -55,7 +55,7 @@ FOOD101_CLASS_MAPPING = {
     "spaghetti_bolognese": "스파게티",
     "lasagna": "라자냐",
     # 아시안 요리
-    "ramen": "일본라멘",  # 한식 라면과 구분
+    "ramen": "라멘",  # 한식 라면과 구분
     "sushi": "초밥",
     "fried_rice": "볶음밥",
     "dumplings": "만두",
