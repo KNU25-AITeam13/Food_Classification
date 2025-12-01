@@ -19,6 +19,10 @@ lrf: 0.01
 momentum: 0.937
 weight_decay: 0.0005
 
+# 과적합 방지
+dropout: 0.2           # 20% 드롭아웃 (정규화)
+label_smoothing: 0.1   # 라벨 스무딩 (과적합 방지)
+
 # Early Stopping
 patience: 10
 

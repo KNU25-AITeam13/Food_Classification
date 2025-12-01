@@ -20,8 +20,9 @@ momentum: 0.937
 weight_decay: 0.0005
 warmup_epochs: 5  # 워밍업 추가
 
-# 정규화
-label_smoothing: 0.1  # 과적합 방지
+# 과적합 방지
+dropout: 0.2
+label_smoothing: 0.1
 
 # Early Stopping
 patience: 20  # 충분한 학습 허용
