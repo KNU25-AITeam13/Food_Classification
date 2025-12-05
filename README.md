@@ -26,6 +26,9 @@ Food_Classification/
 │   ├── train.py                     # 학습 스크립트
 │   ├── predict.py                   # 추론 스크립트
 │   └── prepare_data.py              # 데이터 전처리
+├── models/                          # 사전 학습된 모델 (레포지토리에 포함)
+│   ├── best_mixed_food_v1.pt        # Mixed 모델 (한식+Food-101 39클래스, 93.65% 정확도)
+│   └── README.md                    # 모델 상세 정보
 ├── data/                            # 전처리된 데이터 (gitignore)
 ├── datasets/                        # AI Hub 원본 데이터 (gitignore)
 └── runs/                            # 학습 결과 (gitignore)
@@ -114,18 +117,45 @@ uv run python main.py train --config config/train_config_mixed.yaml
 uv run python main.py train --config config/train_config_full.yaml --resume
 ```
 
-### 3️⃣ 추론
+### 3️⃣ 추론 (사전 학습된 모델 사용)
+
+학습 없이 바로 사용 가능한 모델이 `models/` 폴더에 포함되어 있습니다.
 
 ```bash
-# 단일 이미지 분류
-uv run python main.py predict --model runs/classify/korean_food_test/weights/best.pt --image path/to/food.jpg
+# 🆕 사전 학습된 모델로 바로 추론 (39개 클래스 지원)
+uv run python main.py predict --model models/best_mixed_food_v1.pt --image path/to/food.jpg
 
-# 상세 출력 (Top-5)
-uv run python main.py predict --model runs/classify/korean_food_test/weights/best.pt --image path/to/food.jpg -v
+# 상세 출력 (Top-5 결과)
+uv run python main.py predict --model models/best_mixed_food_v1.pt --image path/to/food.jpg -v
 
 # 결과 JSON 저장
-uv run python main.py predict --model runs/classify/korean_food_test/weights/best.pt --image path/to/food.jpg --save results.json
+uv run python main.py predict --model models/best_mixed_food_v1.pt --image path/to/food.jpg --save results.json
+
+# 또는 직접 학습한 모델 사용
+uv run python main.py predict --model runs/classify/mixed_food/weights/best.pt --image path/to/food.jpg
 ```
+
+## 📦 사전 학습된 모델
+
+이 레포지토리에는 바로 사용 가능한 학습된 모델이 포함되어 있습니다.
+
+### best_mixed_food_v1.pt
+
+| 항목 | 값 |
+|------|-----|
+| 모델 | YOLOv11l-cls |
+| 클래스 수 | 39 (한식 20 + Food-101 19) |
+| Top-1 정확도 | **93.65%** |
+| Top-5 정확도 | **98.86%** |
+| 이미지 크기 | 320x320 |
+| 파일 크기 | 25 MB |
+| 학습 날짜 | 2025-12-01 |
+
+**지원 클래스**:
+- **한식 (20개)**: 비빔밥, 김치찌개, 된장찌개, 불고기, 삼겹살, 김밥, 라면, 짜장면, 짬뽕, 떡볶이, 삼계탕, 갈비찜, 배추김치, 깍두기, 잡채, 계란말이, 파전, 물냉면, 칼국수, 족발
+- **국제 음식 (19개)**: 피자, 햄버거, 스테이크, 핫도그, 감자튀김, 스파게티, 라자냐, 라멘, 초밥, 볶음밥, 만두, 팟타이, 쌀국수, 아이스크림, 치즈케이크, 도넛, 팬케이크, 와플, 시저샐러드
+
+자세한 정보는 [`models/README.md`](models/README.md)를 참고하세요.
 
 ## ⚙️ 학습 설정
 

@@ -50,17 +50,20 @@ uv run python main.py train --config config/train_config_test.yaml --resume
 
 ### Inference
 ```bash
-# Predict single image
-uv run python main.py predict --model runs/classify/korean_food_test/weights/best.pt --image food.jpg
+# Predict with pre-trained model (recommended)
+uv run python main.py predict --model models/best_mixed_food_v1.pt --image food.jpg
 
 # Predict with top-5 results
-uv run python main.py predict --model best.pt --image food.jpg -v
+uv run python main.py predict --model models/best_mixed_food_v1.pt --image food.jpg -v
 
 # Save results to JSON
-uv run python main.py predict --model best.pt --image food.jpg --save results.json
+uv run python main.py predict --model models/best_mixed_food_v1.pt --image food.jpg --save results.json
 
 # Predict multiple images from directory
-uv run python main.py predict --model best.pt --image /path/to/images/
+uv run python main.py predict --model models/best_mixed_food_v1.pt --image /path/to/images/
+
+# Or use custom trained model
+uv run python main.py predict --model runs/classify/mixed_food/weights/best.pt --image food.jpg
 ```
 
 ## Architecture
@@ -71,6 +74,8 @@ uv run python main.py predict --model best.pt --image /path/to/images/
 - **src/train.py**: Training logic using Ultralytics YOLO
 - **src/predict.py**: Inference and prediction utilities
 - **config/**: YAML configuration files for different training modes
+- **models/**: Pre-trained model weights (included in repository)
+  - **best_mixed_food_v1.pt**: Mixed dataset model (39 classes, 93.65% top-1 accuracy)
 
 ### Data Pipeline
 
@@ -166,6 +171,36 @@ runs/classify/{experiment_name}/
 ├── results.csv      # Training metrics
 └── ...
 ```
+
+### Pre-trained Models
+
+This repository includes pre-trained models in the `models/` directory for immediate use:
+
+**best_mixed_food_v1.pt**
+- **Architecture**: YOLOv11l-cls (Large variant)
+- **Classes**: 39 (20 Korean + 19 Food-101)
+- **Performance**:
+  - Top-1 Accuracy: 93.65%
+  - Top-5 Accuracy: 98.86%
+  - Validation Loss: 0.372
+- **Training Details**:
+  - Epochs: 100 (early stopping at best validation)
+  - Image size: 320x320
+  - Batch size: 96
+  - Optimizer: AdamW with cosine LR schedule
+  - Data augmentation: Enhanced (rotation, HSV, random erasing)
+  - Label smoothing: 0.1
+- **File size**: 25 MB
+- **Training date**: 2025-12-01
+
+**Usage in code**:
+```python
+from ultralytics import YOLO
+model = YOLO('models/best_mixed_food_v1.pt')
+results = model.predict('food.jpg')
+```
+
+See `models/README.md` for complete documentation.
 
 ## Important Notes
 

@@ -6,12 +6,15 @@ data/
 
 # Training outputs
 /runs/
-/models/
 
 # Model weights
 *.pt
 *.pth
 *.onnx
+
+# Exception: Allow model weights in models/ directory
+!models/
+!models/**/*.pt
 
 # Compressed files
 *.zip
